@@ -29,7 +29,9 @@ if(validUsers.length>0){return true}
 else{return false}
 };
 const app=express
-app.use(session({secret:"fingerprint"}))
+app.use(session({secret:"fingerprint"}, resave=true,saveUnitialized=true));
+app.use(express.json());
+
 
 const PORT = 8080;
 app.use;

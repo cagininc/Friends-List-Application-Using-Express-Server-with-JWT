@@ -1,7 +1,7 @@
 const express = require("express");
-const jwt = require("jasonwebtoken");
-const session = require("session");
-const routes = require("router/friends.js");
+const jwt = require("jsonwebtoken");
+const session = require("express-session");
+const routes = require("./router/friends.js");
 
 let users = [];
 
@@ -31,55 +31,87 @@ const authenticatedUser = (username, password) => {
     return false;
   }
 };
-const app = express;
+const app = express();
 //MİDDLEWARE
 app.use(
-  session({ secret: "fingerprint" }, (resave = true), (saveUnitialized = true))
-);
+    session({
+        secret: "fingerprint",
+        resave: true,
+        saveUninitialized: true,
+      })
+    );
 //MİDDLEWARE
 app.use(express.json());
 // Checking if user is logged in and has valid access token
-if (req.session.authorization) {
-  let token = req.session.authorization["accessToken"];
-  // Verify JWT token
-  jwt.verify(token, "access", (err, user) => {
-    if (!err) {
-      req.user = user;
-      next(); // Proceed to the next middleware
-    } else {
-      resizeBy.status(403).json({ message: "User not authenticated" });
-    }
-  });
-}
+//URL path "/friends"
+app.use("/friends", (req, res, next) => {
+  if (req.session.authorization) {
+    let token = req.session.authorization["accessToken"];
+    // Verify JWT token
+    jwt.verify(token, "access", (err, user) => {
+      if (!err) {
+        req.user = user;
+        next(); // Proceed to the next middleware
+      } else {
+        res.status(403).json({ message: "User not authenticated" });
+      }
+    });
+  }
+});
+
 //Login Endpoint
-app.GET("/login",(req,res)=>{
-const username=req.body.username;
-const password=req.body.password;
-    // Check if username or password is missing
-if(!username||!password){
-    return res.status(404).json({message:"Error log in"});
-        // Authenticate user
-if(authenticatedUser(username,password))
-        // Generate JWT access token
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+  // Check if username or password is missing
+  if (!username || !password) {
+    return res.status(404).json({ message: "Error log in" });
+  }
+  // Authenticate user
+  if (authenticatedUser(username, password)) {
+    // Generate JWT access token
 
-    {let accessToken=jwt.sign({
-data:password},'access',{expiresIn:60*60}
-)
-        // Store access token and username in session
-req.session.authorization={
-    accessToken,username
-}
+    let accessToken = jwt.sign(
+      {
+        data: password,
+      },
+      "access",
+      { expiresIn: 60 * 60 }
+    );
+    // Store access token and username in session
+    req.session.authorization = {
+      accessToken,
+      username,
+    };
+    return res.status(200).send("User succesfully logged in");
+  } else {
+    return res
+      .status(208)
+      .json({ message: "Invalid login.Check username and password" });
+  }
+});
 
+// User Register Endpoint
+app.post("/register", (req, res) => {
+  const password = req.body.password;
+  const username = req.body.username;
+  // Check if both username and password are provided
+  if (username && password) {
+    // Check if the user does not already exist
 
- }
-}
-}
+    if (!doesExist(username)) {
+      // Add the new user to the users array
 
-)
-
-//Register Endpoint
-
+      users.push({ username: username, password: password });
+      return res
+        .status(200)
+        .json({ message: "User succesfully registered.Now you can login" });
+    } else {
+      return res.status(404).json({ message: "Unable to register user" });
+    }
+  }
+});
 
 const PORT = 8080;
-app.use("router/friends.js",routes);
-app.listen(PORT,()=>console.log("Server is running"))
+app.use("./router/friends.js", routes);
+app.listen(PORT, () => console.log("Server is running"));

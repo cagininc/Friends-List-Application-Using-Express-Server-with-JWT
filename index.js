@@ -113,5 +113,5 @@ app.post("/register", (req, res) => {
 });
 
 const PORT = 8080;
-app.use("./router/friends.js", routes);
+app.use("/friends", routes);
 app.listen(PORT, () => console.log("Server is running"));

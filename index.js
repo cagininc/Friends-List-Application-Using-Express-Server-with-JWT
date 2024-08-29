@@ -32,7 +32,7 @@ const authenticatedUser = (username, password) => {
   }
 };
 const app = express();
-//MİDDLEWARE
+
 app.use(
     session({
         secret: "fingerprint",
@@ -40,7 +40,7 @@ app.use(
         saveUninitialized: true,
       })
     );
-//MİDDLEWARE
+
 app.use(express.json());
 // Checking if user is logged in and has valid access token
 //URL path "/friends"

@@ -2,6 +2,16 @@
 
 ## Overview
 This application allows authenticated users to manage their friends list through a RESTful API built with Express.js. The application uses JSON Web Tokens (JWT) for secure authentication and authorization.
+## Operations
+
+### Register
+![Create Operation](./images/register.png)
+
+### Login
+![Read Operation](./images/login.png)
+
+### Delete
+![Delete Operation](./images/delete.png)
 
 ## Features
 - User registration and login

@@ -2,7 +2,7 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const session = require("express-session");
 const routes = require("./router/friends.js");
-
+//users
 let users = [];
 
 // Checking if a user with the given username already exists

@@ -47,7 +47,7 @@ app.use(express.json());
 app.use("/friends", (req, res, next) => {
   if (req.session.authorization) {
     let token = req.session.authorization["accessToken"];
-    // Verify JWT token
+    // Verifying JWT token
     jwt.verify(token, "access", (err, user) => {
       if (!err) {
         req.user = user;
@@ -69,7 +69,7 @@ app.post("/login", (req, res) => {
   }
   // Authenticate user
   if (authenticatedUser(username, password)) {
-    // Generate JWT access token
+    // Generating JWT access token
 
     let accessToken = jwt.sign(
       {
